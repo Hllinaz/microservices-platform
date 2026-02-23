@@ -4,7 +4,7 @@ La plataforma está diseñada bajo un enfoque de **arquitectura basada en micros
 
 ### Diagrama General de Arquitectura
 
-```Mermaid
+```mermaid
 graph TD
 
     A[Usuario]-->|HTTP| B[Frontend - React Dashboard]
@@ -27,7 +27,7 @@ Cada microservicio se ejecuta en un contenedor aislado, garantizando desacoplami
 
 ### Diagrama de Secuencia - Creación Dinámica de Microservicio
 
-```Mermaid
+```mermaid
 sequenceDiagram
 
     participant U as Usuario
@@ -57,7 +57,7 @@ El proceso de creación es completamente automatizado:
 
 ### Diagrama de Red y Aislamiento
 
-```Mermaid
+```mermaid
 graph LR
 
     subgraph Docker Network
