@@ -1,0 +1,18 @@
+# Node
+node_modules
+npm-debug.log
+
+# Vite
+dist
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+
+# Generated services
+backend/generated-services/*
+
+# Docker
+.env
