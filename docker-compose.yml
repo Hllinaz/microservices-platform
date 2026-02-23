@@ -1,0 +1,24 @@
+services:
+  backend:
+    build: ./backend
+    container_name: ms-backend-manager
+    ports:
+      - '5000:5000'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /backend/generated-services:/app/generated-services
+    networks:
+      - ms-network
+  frontend:
+    build: ./frontend
+    container_name: ms-frontend
+    ports:
+      - '3000:3000'
+    depends_on:
+      - backend
+    networks:
+      - ms-network
+      
+networks:
+  ms-network:
+    driver: bridge
