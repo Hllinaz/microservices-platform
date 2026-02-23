@@ -1,3 +1,32 @@
+## Descripción del Proyecto
+
+La Plataforma de Microservicios es una aplicación web que permite la creación, gestión y eliminación dinámica de microservicios ejecutados en contenedores Docker. Cada microservicio es generado a partir de código fuente ingresado por el usuario y desplegado automáticamente como un servicio HTTP independiente.
+
+## Tecnologías Utilizadas
+
+* **Backend Manager**
+  * **Node.js** — Entorno de ejecución del servidor
+  * **Express.js** — Framework para API REST
+  * **JavaScript (CommonJS)** — Lenguaje principal del backend
+  * **Docker Socket (/var/run/docker.sock)** — Comunicación directa con el Docker Engine para la creación y gestión dinámica de contenedores.
+
+* **Frontend (Dashboard)**
+  * **React** — Biblioteca para interfaz de usuario
+  * **TypeScript** — Tipado estático para mayor seguridad
+  * **Vite** — Bundler y servidor de desarrollo
+  * **ESLint** — Control de calidad y reglas de estilo
+
+* **Contenerización**
+  * **Docker** — Contenedores para aislamiento
+  * **Docker Compose** — Orquestación de servicios base
+  * **Docker BuildKit** — Construcción eficiente de imágenes
+
+* **Microservicios Dinámicos**
+  * **Python** + Flask (Soporte dinámico)
+  * **Node.js** + Express (Soporte dinámico)
+  * Generación automática de Dockerfile
+  * Asignación dinámica de puertos
+
 ## Arquitectura del Sistema
 
 La plataforma está diseñada bajo un enfoque de **arquitectura basada en microservicios con orquestación centralizada**, donde un componente gestor administra dinámicamente la creación y el ciclo de vida de los servicios.
@@ -5,8 +34,7 @@ La plataforma está diseñada bajo un enfoque de **arquitectura basada en micros
 ### Diagrama General de Arquitectura
 
 ```mermaid
-graph TD
-
+flowchart TD
     A[Usuario]-->|HTTP| B[Frontend - React Dashboard]
     B -->|REST API| C[Backend Manager - Node/Express]
     C -->|Docker CLI / Docker SDK| D[Docker Engine]
@@ -19,9 +47,9 @@ graph TD
 
 La arquitectura se compone de tres capas principales:
 
-* **Capa de presentación**: Interfaz web desarrollada en React.
+* **Capa de Presentación**: Interfaz web desarrollada en React.
 * **Capa de Gestión**: Backend encargado de la orquestación de microservicios.
-* **Capa de Ejecucición**: Conjunto de contenedores Docker que ejecutan microservicios independientes.
+* **Capa de Ejecución**: Conjunto de contenedores Docker que ejecutan microservicios independientes.
 
 Cada microservicio se ejecuta en un contenedor aislado, garantizando desacoplamiento y escalabilidad.
 
@@ -80,3 +108,66 @@ Todos los contenedores se encuentran dentro de una red virtual Docker que permit
 * Aislamiento entre servicios
 * Escalabilidad dinámica
 * Independencia de despliegue
+
+## Modelo de Microservicio
+
+Cada microservicio es representado internamente mediante la siguiente estructura:
+
+```typescript
+type Microservice = {
+  id: string
+  name: string
+  description: string
+  language: "python" | "node"
+  port: number
+  status: "created" | "running" | "stopped"
+  containerId?: string
+  createdAt: Date
+}
+```
+
+### Ciclo de Vida del Microservicio
+
+```mermaid
+stateDiagram-v2
+    [*] --> created
+    created --> running
+    running --> stopped
+    stopped --> running
+    stopped --> removed
+    created --> removed
+```
+
+## Cómo Ejecutar el proyecto
+
+Para levantar la plataforma: 
+
+```
+docker compose up --build
+```
+
+Servicios disponibles:
+
+* Frontend: `http://localhost:3000`
+* Backend: `http://localhost:5000`
+  
+La plataforma no incluye microservicios por defecto.
+
+Estos deben ser creados dinámicamente desde el dashboard.
+
+## Principios Arquitectónicos Aplicados
+
+* Aislamiento mediante contenedores independientes.
+* Desacoplamiento entre frontend, backend y microservicios.
+* Orquestación centralizada del ciclo de vida.
+* Escalabilidad dinámica sin límite predefinido de servicios.
+
+La plataforma no define un número máximo de microservicios, permitiendo la creación dinámica de instancias según demanda.
+
+## Checklist antes de presentar
+
+- [ ] Quitar volúmenes en docker-compose
+- [ ] Reconstruir imágenes limpias
+- [ ] Probar desde cero con docker compose up --build
+- [ ] Verificar que no haya microservicios por defecto
+- [ ] Confirmar que README esté actualizado
