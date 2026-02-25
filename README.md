@@ -160,14 +160,111 @@ Estos deben ser creados dinámicamente desde el dashboard.
 El usuario debe escribir únicamente la lógica del servicio, respetando las siguientes reglas:
 
 * **Python**
-  * Debe asignar el resultado final a una variable llamada result.
-  * Puede acceder a parámetros mediante request.args.
-  * No debe declarar Flask ni iniciar el servidor.
+  * Debe asignar el resultado final a una variable llamada `result`.
+  * Puede acceder a parámetros mediante `request.args`.
+  * No debe declarar `Flask` ni iniciar el servidor.
+
+#### Ejemplo 1 -- Hola Mundo
+
+```python
+result = "Hola Mundo desde Python"
+```
+
+Respuesta:
+
+```JSON
+{
+  "result": "Hola mundo desde Python"
+}
+```
+
+#### Ejemplo 2 -- Suma con parámetros
+
+Llamada:
+
+```
+http://localhost:10000/?a=5&b=3
+```
+
+Codigo:
+
+```python
+a = int(request.args.get("a", 0))
+b = int(request.args.get("b", 0))
+
+result = a + b
+```
+
+Respuesta:
+
+```JSON
+{
+  "result": 8
+}
+```
+
+#### Incorrecto (No permitido)
+
+```python
+from flask import Flask
+app = Flask(__name__)
+```
+
+```python
+app.run()
+```
 
 * **Node.js**
-  * Debe asignar el resultado final a una variable llamada result.
-  * Puede acceder a parámetros mediante req.query.
-  * No debe declarar Express ni iniciar el servidor.
+  * Debe asignar el resultado final a una variable llamada `result`.
+  * Puede acceder a parámetros mediante `req.query`.
+  * No debe declarar `Express` ni iniciar el servidor.
+
+#### Ejemplo 1 -- Hola Mundo
+
+```JavaScript
+result = "Hola Mundo desde Node.js";
+```
+
+Respuesta:
+
+```JSON
+{
+  "result": "Hola Mundo desde Node.js"
+}
+```
+
+#### Ejemplo 2 -- Multiplicación con parámetros
+
+```
+http://localhost:10000/?a=4&b=6
+```
+
+Codigo:
+
+```JavaScript
+const a = Number(req.query.a || 0);
+const b = Number(req.query.b || 0);
+
+result = a * b;
+```
+
+Respuesta:
+
+```JSON
+{
+  "result": 24
+}
+```
+
+#### Incorrecto (No permitido)
+
+```JavaScript
+const express = require("express");
+```
+
+```JavaScript
+app.listen(3000);
+```
 
 El sistema se encarga automáticamente de generar la estructura HTTP necesaria.
 
