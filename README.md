@@ -155,6 +155,22 @@ La plataforma no incluye microservicios por defecto.
 
 Estos deben ser creados dinámicamente desde el dashboard.
 
+## Especificación del Código del Usuario
+
+El usuario debe escribir únicamente la lógica del servicio, respetando las siguientes reglas:
+
+* **Python**
+  * Debe asignar el resultado final a una variable llamada result.
+  * Puede acceder a parámetros mediante request.args.
+  * No debe declarar Flask ni iniciar el servidor.
+
+* **Node.js**
+  * Debe asignar el resultado final a una variable llamada result.
+  * Puede acceder a parámetros mediante req.query.
+  * No debe declarar Express ni iniciar el servidor.
+
+El sistema se encarga automáticamente de generar la estructura HTTP necesaria.
+
 ## Principios Arquitectónicos Aplicados
 
 * Aislamiento mediante contenedores independientes.

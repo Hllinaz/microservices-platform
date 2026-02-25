@@ -16,18 +16,21 @@ const PORT = 5000;
 
 const express = require('express');
 const cors = require('cors');
-
 const { randomUUID } = require('crypto')
+
+const dockerManager = require('./services/dockerManager.js');
+const { validateTransition } = require('./services/serviceManager.js')
 
 const app = express();
 const services = new Map();
 
-let nextPort = 6000;
+let nextPort = 10000;
 
 const ServiceStatus = Object.freeze({
   CREATED: "created",
   RUNNING: "running",
-  STOPPED: "stopped"
+  STOPPED: "stopped",
+  REMOVED: "removed"
 });
 const allowedStatuses = Object.values(ServiceStatus);
 
@@ -78,9 +81,11 @@ app.post('/services', (req, res) => {
     name,
     description: description || "",
     language,
+    code,
     port,
     status: ServiceStatus.CREATED,
     containerId: null,
+    imageBuilt: false,
     createdAt: new Date()
   };
 
@@ -92,25 +97,7 @@ app.post('/services', (req, res) => {
   });
 })
 
-app.delete('/services/:id', (req, res) => {
-  const { id } = req.params;
-
-  if (!services.has(id)) {
-    return res.status(404).json({
-      success: false,
-      message: "Service not found"
-    });
-  }
-
-  services.delete(id);
-
-  res.status(200).json({
-    success: true,
-    message: "Service removed"
-  });
-});
-
-app.patch('/services/:id/status', (req, res) => {
+app.patch('/services/:id/status', async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
 
@@ -130,20 +117,44 @@ app.patch('/services/:id/status', (req, res) => {
 
   const service = services.get(id);
 
-  if (status === ServiceStatus.RUNNING) {
-    console.log("Debería iniciar contenedor");
+  try {
+
+    validateTransition(service.status, status);
+
+    switch (status) {
+      case ServiceStatus.RUNNING:
+        if (!service.imageBuilt) {
+          await dockerManager.createService(service);
+          service.imageBuilt = true;
+        }
+        await dockerManager.startService(service);
+        break;
+      case ServiceStatus.STOPPED:
+        await dockerManager.stopService(service);
+        break;
+      case ServiceStatus.REMOVED:
+        await dockerManager.removeService(service);
+        break;
+    }
+
+    service.status = status;
+
+    res.status(200).json({
+      success: true,
+      service
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    const isBusinessError =
+      error.message.includes("Invalid transition");
+
+    return res.status(isBusinessError ? 400 : 500).json({
+      success: false,
+      message: error.message
+    });
   }
-
-  if (status === ServiceStatus.STOPPED) {
-    console.log("Debería detener contenedor");
-  }
-
-  service.status = status;
-
-  res.status(200).json({
-    sucess: true,
-    service
-  });
 });
 
 app.listen(PORT, () => {

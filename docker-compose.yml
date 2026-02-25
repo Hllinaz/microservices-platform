@@ -7,7 +7,7 @@ services:
     volumes:
       - ./backend:/app
       - /var/run/docker.sock:/var/run/docker.sock
-      - /backend/generated-services:/app/generated-services
+      - ./backend/generated-services:/app/generated-services
     networks:
       - ms-network
   frontend:
