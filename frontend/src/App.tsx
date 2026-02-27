@@ -1,25 +1,31 @@
-import { useEffect, useState } from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Sidebar from "./components/Sidebar/sidebar";
+import Home from "./pages/Home/Home";
+import Dashboard from "./pages/Dashboard/Dashboard";
 
 function App() {
-  const [backendStatus, setBackendStatus] = useState<string>("Loading...")
-
-  useEffect(() => {
-    fetch("http://localhost:5000/health")
-      .then(res => res.json())
-      .then(data => {
-        setBackendStatus(data.status)
-      })
-      .catch(() => {
-        setBackendStatus("Backend not reachable")
-      })
-  }, [])
-
   return (
-    <div style={{ padding: "40px", fontFamily: "Arial" }}>
-      <h1>Microservices Platform</h1>
-      <h2>Backend Status: {backendStatus}</h2>
-    </div>
-  )
+    <BrowserRouter>
+      <div style={{ display: "flex", height: "100vh" }}>
+        <Sidebar />
+        <main
+          style={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            height: "100vh",
+            overflow: "auto",
+          }}
+        >
+          <Routes>
+            <Route path="/" element={<Navigate to="/home" replace />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+          </Routes>
+        </main>
+      </div>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
