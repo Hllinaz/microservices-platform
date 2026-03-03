@@ -1,0 +1,116 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.modal {
+    background: #111827;
+    border: 1px solid rgba(229,57,53,0.25);
+    border-radius: 14px;
+    width: 420px;
+    max-width: 95vw;
+    padding: 32px 28px 24px;
+    text-align: center;
+    animation: slideUp 0.2s ease;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.iconWrapper {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(229,57,53,0.1);
+    border: 1px solid rgba(229,57,53,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.icon {
+    color: #e53935;
+    font-size: 1.4rem;
+}
+
+.title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 12px;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.message {
+    font-size: 0.875rem;
+    color: var(--text-dim, #8892a4);
+    line-height: 1.6;
+    margin: 0 0 10px;
+    font-family: system-ui, sans-serif;
+}
+
+.message strong { color: #e2e8f0; }
+
+.warning {
+    font-size: 0.8rem;
+    color: #e53935;
+    margin: 0 0 24px;
+    font-family: system-ui, sans-serif;
+}
+
+.footer {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.cancelBtn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    border-radius: 8px;
+    border: 1px solid #1e2230;
+    background: none;
+    color: var(--text-dim, #555f7a);
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-family: inherit;
+    transition: all 0.15s;
+}
+
+.cancelBtn:hover { border-color: #334155; color: #e2e8f0; }
+
+.deleteBtn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 20px;
+    border-radius: 8px;
+    border: none;
+    background: #e53935;
+    color: #fff;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 600;
+    font-family: inherit;
+    transition: background 0.15s;
+}
+
+.deleteBtn:hover:not(:disabled) { background: #c62828; }
+.deleteBtn:disabled { opacity: 0.5; cursor: not-allowed; }

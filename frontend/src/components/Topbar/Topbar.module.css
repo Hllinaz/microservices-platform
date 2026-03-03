@@ -1,0 +1,83 @@
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    height: 60px;
+    background: var(--bg, #0f1117);
+    border-bottom: 1px solid var(--border, #1e2230);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.searchWrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface, #161b27);
+    border: 1px solid var(--border, #1e2230);
+    border-radius: 8px;
+    padding: 8px 14px;
+    width: 320px;
+    transition: border-color 0.2s;
+}
+
+.searchWrapper:focus-within {
+    border-color: var(--accent, #e53935);
+}
+
+.searchIcon {
+    color: var(--text-dim, #555f7a);
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.searchInput {
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text, #e2e8f0);
+    font-size: 0.875rem;
+    width: 100%;
+    font-family: inherit;
+}
+
+.searchInput::placeholder {
+    color: var(--text-dim, #555f7a);
+}
+
+.rightSection {
+    display: flex;
+    align-items: center;
+}
+
+.clusterBadge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+    color: var(--text, #e2e8f0);
+}
+
+.statusDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.dotActive {
+    background: #22c55e;
+    box-shadow: 0 0 6px #22c55e99;
+}
+
+.dotInactive {
+    background: #ef4444;
+    box-shadow: 0 0 6px #ef444499;
+}
+
+.clusterLabel {
+    color: var(--text-dim, #555f7a);
+    white-space: nowrap;
+}

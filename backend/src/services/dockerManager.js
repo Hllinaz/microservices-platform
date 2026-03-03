@@ -16,6 +16,12 @@ const util = require('util');
 const execAsync = util.promisify(exec);
 
 function generatePythonApp(service) {
+
+  const indentedCode = service.code
+    .split("\n")
+    .map(line => line.trim() === "" ? line : "    " + line)
+    .join("\n");
+
   return `
 from flask import Flask, request, jsonify
 
@@ -25,7 +31,7 @@ app = Flask(__name__)
 def execute():
   try:
     # === USER CODE START ===
-    ${service.code}
+${indentedCode}
     # === USER CODE END ===
 
     return jsonify({"result": result})
