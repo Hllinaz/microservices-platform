@@ -22,9 +22,11 @@ const dockerManager = require('./services/dockerManager.js');
 const { validateTransition } = require('./services/serviceManager.js')
 
 const app = express();
-const services = new Map();
+const services = dockerManager.loadServices()
 
-let nextPort = 10000;
+let nextPort = services.size
+  ? Math.max(...Array.from(services.values()).map(s => s.port)) + 1
+  : 10000;
 
 const ServiceStatus = Object.freeze({
   CREATED: "created",
@@ -46,13 +48,16 @@ app.get('/health', (req, res) => {
 });
 
 app.get('/services', (req, res) => {
-  const allServices = Array.from(services.values());
+
+  const allServices = Array.from(services.values())
+    .filter(s => s.status !== ServiceStatus.REMOVED);
 
   res.status(200).json({
     success: true,
     count: allServices.length,
     services: allServices
   });
+
 });
 
 app.post('/services', (req, res) => {
@@ -90,12 +95,13 @@ app.post('/services', (req, res) => {
   };
 
   services.set(id, newService);
+  dockerManager.saveService(newService)
 
   res.status(201).json({
     success: true,
     service: newService
   });
-})
+});
 
 app.patch('/services/:id/status', async (req, res) => {
   const { id } = req.params;
@@ -126,7 +132,9 @@ app.patch('/services/:id/status', async (req, res) => {
         if (!service.imageBuilt) {
           await dockerManager.createService(service);
           service.imageBuilt = true;
+          dockerManager.saveService(service);
         }
+
         await dockerManager.startService(service);
         break;
       case ServiceStatus.STOPPED:
@@ -134,10 +142,19 @@ app.patch('/services/:id/status', async (req, res) => {
         break;
       case ServiceStatus.REMOVED:
         await dockerManager.removeService(service);
-        break;
+
+        dockerManager.archiveService(service);
+
+        services.delete(id)
+
+        return res.status(200).json({
+          success: true,
+          message: "Service removed"
+        });
     }
 
     service.status = status;
+    dockerManager.saveService(service)
 
     res.status(200).json({
       success: true,
@@ -155,6 +172,51 @@ app.patch('/services/:id/status', async (req, res) => {
       message: error.message
     });
   }
+});
+
+app.patch('/services/:id', async (req, res) => {
+
+  const { id } = req.params;
+  const { description, code } = req.body;
+
+  if (!services.has(id)) {
+    return res.status(404).json({
+      success: false,
+      message: "Service not found"
+    });
+  }
+
+  const service = services.get(id);
+
+  try {
+
+    if (description !== undefined) {
+      service.description = description;
+    }
+
+    if (code !== undefined) {
+      service.code = code;
+    }
+
+    await dockerManager.updateServiceCode(service);
+
+    dockerManager.saveService(service);
+
+    res.json({
+      success: true,
+      service
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+
 });
 
 app.listen(PORT, () => {
