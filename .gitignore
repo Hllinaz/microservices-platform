@@ -13,6 +13,7 @@ dist
 
 # Generated services
 backend/generated-services/*
+backend/archived-services/*
 
 # Docker
 .env

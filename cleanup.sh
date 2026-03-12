@@ -2,19 +2,24 @@
 
 LABEL="platform=microservices-dynamic"
 
+GENERATED_DIR="backend/generated-services"
+ARCHIVED_DIR="backend/archived-services"
+
 if [ -z "$1" ]; then
   echo "🧹 Eliminando TODOS los microservicios dinámicos..."
 
   # Detener contenedores
-  docker stop "$(docker ps -q --filter "label=$LABEL")" 2>/dev/null
+  docker ps -q --filter "label=$LABEL" | xargs -r docker stop
 
   # Eliminar contenedores
-  docker rm "$(docker ps -aq --filter "label=$LABEL")" 2>/dev/null
+  docker ps -aq --filter "label=$LABEL" | xargs -r docker rm
 
   # Eliminar imágenes
-  docker rmi "$(docker images -q --filter "label=$LABEL")" 2>/dev/null
+  docker images -q --filter "label=$LABEL" | xargs -r docker rmi
 
-	sudo rm -rf backend/generated-services/*
+  # Eliminar archivos generados
+  [ -d "$GENERATED_DIR" ] && rm -rf "${GENERATED_DIR:?}"/*
+  [ -d "$ARCHIVED_DIR" ] && rm -rf "${ARCHIVED_DIR:?}"/*
 
   echo "✅ Limpieza completa."
 
@@ -33,7 +38,9 @@ else
   # Eliminar imagen específica
   docker rmi "$NAME" 2>/dev/null
 
-  sudo rm -rf backend/generated-services/"$ID"
+  # Eliminar carpetas
+  [ -d "$GENERATED_DIR/$ID" ] && rm -rf "${GENERATED_DIR:?}/${ID:?}"
+  [ -d "$ARCHIVED_DIR/$ID" ] && rm -rf "${ARCHIVED_DIR:?}/${ID:?}"
 
   echo "✅ Microservicio $ID eliminado."
 fi

@@ -25,10 +25,10 @@ interface Service {
 }
 
 const statusConfig: Record<Status, { label: string; color: string; bg: string }> = {
-    created:  { label: 'Creado',    color: '#94a3b8', bg: 'rgba(148,163,184,0.1)' },
-    running:  { label: 'Activo',    color: '#22c55e', bg: 'rgba(34,197,94,0.1)'   },
-    stopped:  { label: 'Detenido',  color: '#f59e0b', bg: 'rgba(245,158,11,0.1)'  },
-    removed:  { label: 'Eliminado', color: '#e53935', bg: 'rgba(229,57,53,0.1)'   },
+    created: { label: 'Creado', color: '#94a3b8', bg: 'rgba(148,163,184,0.1)' },
+    running: { label: 'Activo', color: '#22c55e', bg: 'rgba(34,197,94,0.1)' },
+    stopped: { label: 'Detenido', color: '#f59e0b', bg: 'rgba(245,158,11,0.1)' },
+    removed: { label: 'Eliminado', color: '#e53935', bg: 'rgba(229,57,53,0.1)' },
 };
 
 function ServiceCard({
@@ -117,14 +117,14 @@ function ServiceCard({
 }
 
 export default function Dashboard() {
-    const [services, setServices]         = useState<Service[]>([]);
-    const [fetching, setFetching]         = useState(true);
-    const [loadingId, setLoadingId]       = useState<string | null>(null);
-    const [error, setError]               = useState<string | null>(null);
-    const [showCreate, setShowCreate]     = useState(false);
-    const [editTarget, setEditTarget]     = useState<Service | null>(null);
+    const [services, setServices] = useState<Service[]>([]);
+    const [fetching, setFetching] = useState(true);
+    const [loadingId, setLoadingId] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
+    const [showCreate, setShowCreate] = useState(false);
+    const [editTarget, setEditTarget] = useState<Service | null>(null);
     const [deleteTarget, setDeleteTarget] = useState<Service | null>(null);
-    const [search, setSearch]             = useState('');
+    const [search, setSearch] = useState('');
 
     const fetchServices = useCallback(async () => {
         try {
@@ -171,6 +171,28 @@ export default function Dashboard() {
         const data = await res.json();
         if (!data.success) throw new Error(data.message);
         setServices(prev => [data.service, ...prev]);
+    };
+
+    const handleEdit = async (id: string, payload: {
+        description: string;
+        code: string;
+    }) => {
+
+        const res = await fetch(`${API}/services/${id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (!data.success) throw new Error(data.message);
+
+        setServices(prev =>
+            prev.map(s =>
+                s.id === id ? { ...s, ...payload } : s
+            )
+        );
     };
 
     const filtered = services.filter(s =>
@@ -236,7 +258,10 @@ export default function Dashboard() {
             {editTarget && (
                 <ServiceModal mode="edit" service={editTarget}
                     onClose={() => setEditTarget(null)}
-                    onSubmit={async () => setEditTarget(null)} />
+                    onSubmit={async (payload) => {
+                        await handleEdit(editTarget.id, payload);
+                        setEditTarget(null)
+                    }} />
             )}
             {deleteTarget && (
                 <DeleteModal service={deleteTarget}
